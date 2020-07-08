@@ -2,7 +2,7 @@ import inspect
 from enum import Enum
 
 def inject(ref):
-    SimpleInjector().resolve(ref)
+    return SimpleInjector().resolve(ref)
 
 class SimpleInjector():
     def __init__(self):
