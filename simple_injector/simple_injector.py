@@ -1,6 +1,9 @@
 import inspect
 from enum import Enum
 
+def inject(ref):
+    SimpleInjector().resolve(ref)
+
 class SimpleInjector():
     def __init__(self):
         if not self.dependencies:
@@ -26,14 +29,15 @@ class SimpleInjector():
     def __register(self, ref, iobj):
         self.dependencies.update({ref:iobj})
 
-    def register(self, ref):
+    def register(self, ref, obj=None):
         """
         Used to register a class on the dependencies list.
+        Can also receive an instance of the object that you want to assign to it.
         """
-        iobj = InjectedObject(ref, InjectionType.EAGER)
+        iobj = InjectedObject(ref, InjectionType.EAGER, obj)
         self.__register(ref, iobj)
 
-    def register_singleton(self, ref):
+    def singleton(self, ref):
         """
         Used to register a class as a singleton on the dependencies list.
         This class' dependencies will be resolved at the moment of this method call, so
@@ -42,13 +46,13 @@ class SimpleInjector():
         iobj = InjectedObject(ref, InjectionType.SINGLETON, self.instantiate(ref))
         self.__register(ref, iobj)
 
-    def register_instance(self, ref, obj):
+    def lazy(self, ref, obj):
         """
         Used to register a class with its instantiate object on the dependencies list.
         Any call to `SimpleInjector().resolve(class)` to this class will be resolved
         with the object previously provided.
         """
-        iobj = InjectedObject(ref, InjectionType.EAGER, obj)
+        iobj = InjectedObject(ref, InjectionType.LAZY, obj)
         self.__register(ref, iobj)
 
     def resolve(self, ref):
@@ -92,6 +96,6 @@ class InjectedObject():
         self.__obj = obj
 
     def get(self):
-        if self.__type == InjectionType.SINGLETON:
+        if self.__type == InjectionType.SINGLETON or self.__obj is not None:
             return self.__obj
         return SimpleInjector().instantiate(self.__ref)

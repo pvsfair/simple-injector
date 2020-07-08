@@ -1,1 +1,1 @@
-from .simple-injector import *
+from .simple_injector import SimpleInjector, inject
