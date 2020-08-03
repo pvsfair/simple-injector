@@ -34,6 +34,14 @@ class SimpleInjector():
         Used to register a class on the dependencies list.
         Can also receive an instance of the object that you want to assign to it.
         """
+        if callable(obj):
+            if len(inspect.signature(obj).parameters) > 1:
+                raise Exception("Should be 0 or 1 parameter")
+
+            iobj = InjectedObject(ref, InjectionType.LAMBDA, obj)
+            self.__register(ref, iobj)
+            return
+
         iobj = InjectedObject(ref, InjectionType.EAGER, obj)
         self.__register(ref, iobj)
 
@@ -86,6 +94,7 @@ class InjectionType(Enum):
     SINGLETON=1
     EAGER=2
     LAZY=3 # To be implemented
+    LAMBDA=4
 
 class InjectedObject():
     def __init__(self, instance_ref, injection_type: InjectionType, obj=None):
@@ -96,6 +105,16 @@ class InjectedObject():
         self.__obj = obj
 
     def get(self):
+        if self.__type == InjectionType.LAMBDA:
+            params = inspect.signature(self.__obj).parameters
+            deps = {}
+            if len(params):
+                deps = {
+                    name: SimpleInjector().instantiate(self.__ref)
+                    for name in params
+                }
+            return self.__obj(**deps)
+
         if self.__type == InjectionType.SINGLETON or self.__obj is not None:
             return self.__obj
         return SimpleInjector().instantiate(self.__ref)
