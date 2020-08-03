@@ -40,9 +40,12 @@ serv = inject(Service)
 ### `SimpleInjector()`
 This will always return the same instance of the SimpleInjector.
 
-### `SimpleInjector().register(class, obj=None)`
+### `SimpleInjector().register(class, obj_or_callable=None)`
 Used to register a class on the dependencies list.
 Can also receive an instance of the object that you want to assign to it.
+Can also receive a callable with one parameter, that will be the instance of the Reference.
+Can also receive a callable with 0 parameters.
+Any lambda received as a parameter should always return the instance that will be injected.
 
 ### `SimpleInjector().singleton(class)`
 Used to register a class as a singleton on the dependencies list.
@@ -50,14 +53,14 @@ This class' dependencies will be resolved at the moment of this method call, so 
 
 ### `SimpleInjector().lazy(class, obj)`
 Used to register a class with its instantiate object on the dependencies list.
-any call to `SimpleInjector().resolve(class)` to this class will be resolved with the object previously provided.
+Any call to `SimpleInjector().resolve(class)` to this class will be resolved with the object previously provided.
 
 ### `SimpleInjector().resolve(class)` or `inject`
 Used to resolve a dependency of a class that has been registered prior to the execution of this resolve method.
-This method will return any object it has on the dependency list for this class, if it is a singleton, or a registered object, otherwise it will return a new instance for the class provided, injecting all needed dependencies, if they were registered prior to the execution of this method.
+This method will return an object it has on the dependency list for this class, if it is a singleton, or a registered object, otherwise it will return a new instance for the class provided, injecting all needed dependencies, if they were registered prior to the execution of this method.
 
 ### `SimpleInjector().instantiate(class, extraParams={})`
 Can be used if you need to get a new instance of some class, or if you want a new instance and want to override some param on the constructor of the class.
 
 ### `SimpleInjector().reset()`
-Can be used if you need to be sure that the SimpleInjector has no dependencies registered on its list.
+Can be used if you need to be sure that the SimpleInjector has no dependencies registered on its list
